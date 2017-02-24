@@ -1,0 +1,97 @@
+use std::fs;
+use std::env;
+pub use std::path::{Path, PathBuf};
+
+#[derive(Debug)]
+pub struct DotFile {
+    pub exists:        bool,
+    pub basename:      PathBuf,
+    pub absolute_path: PathBuf,
+    pub dotfile_path:  PathBuf,
+    homedir:           PathBuf,
+}
+
+impl DotFile {
+    pub fn new(p: & String) -> Result<DotFile, &'static str> {
+        let dotfile = _init(PathBuf::from(p));
+        dotfile
+    }
+
+    #[allow(dead_code)]
+    pub fn is_dotted(&self) -> bool {
+        let first_char = match self.basename.to_str().unwrap().chars().nth(0) {
+            Some(c) => c,
+            None => ' ',
+        };
+
+        if first_char == '.' {
+            true
+        } else {
+            false
+        }
+    }
+
+    #[allow(dead_code)]
+    fn dot(&mut self) -> PathBuf { // Getting less hacky
+        let first_char = match self.basename.to_str() { // get first char
+            Some(string) => string.chars().nth(0),
+            None => None
+        }.unwrap();
+
+        if first_char != '.' {
+            let mut dotfile_path = self.homedir.to_path_buf();
+            dotfile_path.push(
+                {".".to_string() + &self.basename.to_str().unwrap()}
+            );
+            dotfile_path
+        } else {
+            let mut dotfile_path = self.homedir.to_path_buf();
+            dotfile_path.push(&self.basename);
+            dotfile_path
+        }
+    }
+
+    #[allow(dead_code)]
+    fn undot(&self) -> PathBuf {
+        let first_char = match self.basename.to_str() { // get first char
+            Some(string) => string.chars().nth(0),
+            None => None
+        }.unwrap();
+
+        if first_char == '.' {
+            let mut path = self.basename.to_str().unwrap();
+            path = &path[1..path.len()];
+            PathBuf::from(path)
+        } else {
+            PathBuf::from(&self.basename.to_str().unwrap())
+        }
+    }
+
+}
+
+
+fn _init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
+    let homedir = match env::home_dir() { // Option<PathBuf>
+        Some(path) => {
+            path
+        },
+        _ => return Err("Can't find home direcotry!")
+    };
+
+    let absolute_path = PathBuf::from(&fs::canonicalize(relpath).expect("Given bogus path!"));
+    let basename      = PathBuf::from(absolute_path.file_name().expect("No file name!"));
+    let dotfile_path  = PathBuf::new(); // temporary
+    let exists        = absolute_path.exists();
+
+    let mut dotfile = DotFile {
+        exists:        exists,
+        basename:      basename,
+        absolute_path: absolute_path,
+        dotfile_path:  dotfile_path,
+        homedir:       homedir,
+    };
+
+    dotfile.dotfile_path = dotfile.dot();
+    let dotfile = dotfile; // make immutable
+    Ok(dotfile) // return
+}
