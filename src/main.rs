@@ -1,11 +1,6 @@
 extern crate dotfile;
 use dotfile::dotfile::DotFile;
-
-#[cfg(target_family = "unix")]
 use std::os::unix::fs;
-
-#[cfg(target_family = "windows")]
-panic!("Windows is not supported!");
 
 fn main() {
     let mut args = std::env::args();
@@ -17,14 +12,18 @@ fn main() {
             Err(msg)    => panic!("{}", msg),
         };
 
+        // println!("{:?}", dotfile);
         if dotfile.exists { // check existence
             match fs::symlink(&dotfile.absolute_path, &dotfile.dotfile_path) { // if so, symlink
                 Ok(_)  => {},
-                Err(_) => println!("There was an error while trying to symlink {} to {}",
-                    dotfile.absolute_path.display(), dotfile.dotfile_path.display()),
+                Err(_) => {
+                    println!("There was an error while trying to symlink {} to {}",
+                        &dotfile.absolute_path.display(), &dotfile.dotfile_path.display());
+                        println!("{:?}", &dotfile);
+                    },
             }
-        } else {
-            // else, error
+        } else { // error
+            println!("{:?}", dotfile);
             panic!("File doesn't exist!");
         }
     }
