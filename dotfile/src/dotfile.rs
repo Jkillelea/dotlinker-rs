@@ -30,10 +30,10 @@ impl DotFile {
 
     #[allow(dead_code)]
     pub fn is_dotted(&self) -> bool {
-        let first_char = match self.basename.to_str().unwrap().chars().nth(0) {
-            Some(c) => c,
-            None => ' ',
-        };
+        let first_char = match self.basename.to_str() {
+            Some(string) => string.chars().nth(0),
+            None => None,
+        }.unwrap();
 
         if first_char == '.' {
             true
@@ -44,12 +44,8 @@ impl DotFile {
 
     #[allow(dead_code)]
     fn dot(&mut self) -> PathBuf { // Getting less hacky
-        let first_char = match self.basename.to_str() { // get first char
-            Some(string) => string.chars().nth(0),
-            None => None
-        }.unwrap();
 
-        if first_char != '.' {
+        if !self.is_dotted() {
             let mut dotfile_path = self.homedir.to_path_buf();
             dotfile_path.push(
                 {".".to_string() + &self.basename.to_str().unwrap()}
