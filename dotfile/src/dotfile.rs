@@ -1,14 +1,25 @@
 use std::fs;
+use std::fmt;
 use std::env;
 pub use std::path::{Path, PathBuf};
 
-#[derive(Debug)]
 pub struct DotFile {
     pub exists:        bool,
     pub basename:      PathBuf,
     pub absolute_path: PathBuf,
     pub dotfile_path:  PathBuf,
     homedir:           PathBuf,
+}
+
+impl fmt::Debug for DotFile {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "DotFile {{ \n\texists:        {}\n\tbasename:      {}\n\tabsolute_path: {}\n\tdotfile_path:  {}\n\thomedir:       {}\n}}",
+                self.exists,
+                self.basename.display(),
+                self.absolute_path.display(),
+                self.dotfile_path.display(),
+                self.homedir.display())
+    }
 }
 
 impl DotFile {
