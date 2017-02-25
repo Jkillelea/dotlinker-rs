@@ -43,7 +43,7 @@ impl DotFile {
     }
 
     #[allow(dead_code)]
-    fn dot(&mut self) -> PathBuf { // Getting less hacky
+    fn dot(&self) -> PathBuf { // Getting less hacky
 
         if !self.is_dotted() {
             let mut dotfile_path = self.homedir.to_path_buf();
@@ -60,12 +60,7 @@ impl DotFile {
 
     #[allow(dead_code)]
     fn undot(&self) -> PathBuf {
-        let first_char = match self.basename.to_str() { // get first char
-            Some(string) => string.chars().nth(0),
-            None => None
-        }.unwrap();
-
-        if first_char == '.' {
+        if self.is_dotted() {
             let mut path = self.basename.to_str().unwrap();
             path = &path[1..path.len()];
             PathBuf::from(path)
