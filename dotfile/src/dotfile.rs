@@ -24,7 +24,7 @@ impl fmt::Debug for DotFile {
 
 impl DotFile {
     pub fn new(p: & String) -> Result<DotFile, &'static str> {
-        let dotfile = _init(PathBuf::from(p));
+        let dotfile = init(PathBuf::from(p));
         dotfile
     }
 
@@ -81,7 +81,7 @@ impl DotFile {
 }
 
 
-fn _init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
+fn init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
     let homedir = match env::home_dir() { // Option<PathBuf>
         Some(path) => {
             path
