@@ -13,7 +13,12 @@ pub struct DotFile {
 
 impl fmt::Debug for DotFile {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "DotFile {{ \n\texists:        {}\n\tbasename:      {}\n\tabsolute_path: {}\n\tdotfile_path:  {}\n\thomedir:       {}\n}}",
+        write!(f, "DotFile {{ \n\texists:        {}\
+        \n\tbasename:      {}\
+        \n\tabsolute_path: {}\
+        \n\tdotfile_path:  {}\
+        \n\thomedir:       {}\
+        \n}}",
                 self.exists,
                 self.basename.display(),
                 self.absolute_path.display(),
