@@ -12,14 +12,14 @@ fn main() {
             Err(msg)    => panic!("{}", msg),
         };
 
-        // println!("{:?}", dotfile);
         if dotfile.exists { // check existence
             match fs::symlink(&dotfile.absolute_path, &dotfile.dotfile_path) { // if so, symlink
                 Ok(_)  => {},
-                Err(_) => {
+                Err(e) => {
                     println!("There was an error while trying to symlink {} to {}",
                         &dotfile.absolute_path.display(), &dotfile.dotfile_path.display());
-                        println!("{:?}", &dotfile);
+                    println!("{:?}", &dotfile);
+                    println!("{:?}", e);
                     },
             }
         } else { // error
