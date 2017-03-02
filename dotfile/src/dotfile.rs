@@ -68,7 +68,7 @@ impl DotFile {
     fn undot(&self) -> PathBuf {
         if self.is_dotted() {
             let mut path = self.basename.to_str().unwrap();
-            path = &path[1..path.len()];
+            path = &path[1..];
             PathBuf::from(path)
         } else {
             PathBuf::from(&self.basename.to_str().unwrap())
