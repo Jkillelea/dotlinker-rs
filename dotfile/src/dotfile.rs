@@ -1,7 +1,7 @@
 use std::fs;
 use std::fmt;
 use std::env;
-pub use std::path::{Path, PathBuf};
+pub use std::path::PathBuf;
 
 pub struct DotFile {
     pub exists:        bool,
@@ -11,21 +11,28 @@ pub struct DotFile {
     homedir:           PathBuf,
 }
 
-impl fmt::Debug for DotFile {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "DotFile {{ \
-            \n\texists:        {}\
-            \n\tbasename:      {}\
-            \n\tabsolute_path: {}\
-            \n\tdotfile_path:  {}\
-            \n\thomedir:       {}\
-            \n}}",
-            self.exists,
-            self.basename.display(),
-            self.absolute_path.display(),
-            self.dotfile_path.display(),
-            self.homedir.display())
-    }
+fn init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
+    let homedir = match env::home_dir() { // Option<PathBuf>
+        Some(path) => path,
+        _ => return Err("Can't find home direcotry!")
+    };
+
+    let absolute_path = PathBuf::from( &fs::canonicalize(relpath).expect("Given bogus file path!") );
+    let basename      = PathBuf::from(absolute_path.file_name().expect("No file name!"));
+    let exists        = absolute_path.exists();
+    let dotfile_path  = PathBuf::new(); // temporary
+
+    let mut dotfile = DotFile {
+        exists:        exists,
+        basename:      basename,
+        absolute_path: absolute_path,
+        dotfile_path:  dotfile_path,
+        homedir:       homedir,
+    };
+
+    dotfile.dotfile_path = dotfile.dot();
+    let dotfile = dotfile; // make immutable
+    Ok(dotfile) // return
 }
 
 impl DotFile {
@@ -68,7 +75,7 @@ impl DotFile {
     fn undot(&self) -> PathBuf {
         if self.is_dotted() {
             let mut path = self.basename.to_str().unwrap();
-            path = &path[1..];
+            path = &path[1..]; // chop off first char
             PathBuf::from(path)
         } else {
             PathBuf::from(&self.basename.to_str().unwrap())
@@ -77,27 +84,19 @@ impl DotFile {
 
 }
 
-
-fn init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
-    let homedir = match env::home_dir() { // Option<PathBuf>
-        Some(path) => path,
-        _ => return Err("Can't find home direcotry!")
-    };
-
-    let absolute_path = PathBuf::from( &fs::canonicalize(relpath).expect("Given bogus file path!") );
-    let basename      = PathBuf::from(absolute_path.file_name().expect("No file name!"));
-    let dotfile_path  = PathBuf::new(); // temporary
-    let exists        = absolute_path.exists();
-
-    let mut dotfile = DotFile {
-        exists:        exists,
-        basename:      basename,
-        absolute_path: absolute_path,
-        dotfile_path:  dotfile_path,
-        homedir:       homedir,
-    };
-
-    dotfile.dotfile_path = dotfile.dot();
-    let dotfile = dotfile; // make immutable
-    Ok(dotfile) // return
+impl fmt::Debug for DotFile {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "DotFile {{ \
+            \n\texists:        {}\
+            \n\tbasename:      {}\
+            \n\tabsolute_path: {}\
+            \n\tdotfile_path:  {}\
+            \n\thomedir:       {}\
+            \n}}",
+            self.exists,
+            self.basename.display(),
+            self.absolute_path.display(),
+            self.dotfile_path.display(),
+            self.homedir.display())
+    }
 }
