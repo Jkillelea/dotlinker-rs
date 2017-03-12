@@ -19,7 +19,7 @@ pub struct DotFile {
     homedir:           PathBuf,
 }
 
-fn init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
+fn init(relpath: &PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
 
     let homedir       = find!(env::home_dir());
     let absolute_path = PathBuf::from( &fs::canonicalize(relpath).expect("Given bogus file path!") );
@@ -41,8 +41,9 @@ fn init(relpath: PathBuf) -> Result<DotFile, &'static str> { // init handles pre
 }
 
 impl DotFile {
+    #[allow(dead_code)]
     pub fn new(p: & String) -> Result<DotFile, &'static str> {
-        let dotfile = init(PathBuf::from(p)); // Result<DotFile, &'static str>
+        let dotfile = init(&PathBuf::from(p)); // Result<DotFile, &'static str>
         dotfile
     }
 
@@ -63,28 +64,22 @@ impl DotFile {
     #[allow(dead_code)]
     fn dot(&self) -> PathBuf { // Getting less hacky
 
+        let mut dotfile_path = self.homedir.to_path_buf();
         if !self.is_dotted() {
-            let mut dotfile_path = self.homedir.to_path_buf();
-            dotfile_path.push(
-                ".".to_string() + &self.basename.to_str().unwrap()
-            );
-            dotfile_path
+            dotfile_path.push(".".to_string() + &self.basename.to_str().unwrap());
         } else {
-            let mut dotfile_path = self.homedir.to_path_buf();
             dotfile_path.push(&self.basename);
-            dotfile_path
         }
+        dotfile_path
     }
 
     #[allow(dead_code)]
     fn undot(&self) -> PathBuf {
+        let mut path = self.basename.to_str().unwrap();
         if self.is_dotted() {
-            let mut path = self.basename.to_str().unwrap();
             path = &path[1..]; // chop off first char
-            PathBuf::from(path)
-        } else {
-            PathBuf::from(&self.basename.to_str().unwrap())
         }
+        PathBuf::from(path)
     }
 
 }
