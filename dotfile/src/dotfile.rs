@@ -3,12 +3,8 @@ use std::fmt;
 use std::env;
 pub use std::path::PathBuf;
 
-macro_rules! find {
-    ($x:expr) =>
-    (match $x { // Option<T>
-        Some(thing) => thing,
-        _ => return Err("Macro 'find!' couldn't find anything!")
-    });
+macro_rules! is_dotted {
+    ($x: expr) => (($x.to_str().unwrap().chars().nth(0) == Some('.')));
 }
 
 pub struct DotFile {
@@ -16,61 +12,44 @@ pub struct DotFile {
     pub basename:      PathBuf, // PathBuf because we want ownership and editability
     pub absolute_path: PathBuf,
     pub dotfile_path:  PathBuf,
-    homedir:           PathBuf,
+    pub homedir:       PathBuf,
 }
 
 fn init(relpath: &PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
+    let absolute_path = fs::canonicalize(relpath).unwrap();
+    let basename = PathBuf::from(absolute_path.file_name().unwrap());
+    let exists   = absolute_path.exists();
+    let homedir  = match env::home_dir() {
+        Some(path) => path as PathBuf,
+        None       => return Err("No home directory was found!")
+    };
+    let dotfile_path = dot(&basename, &homedir);
 
-    let homedir       = find!(env::home_dir());
-    let absolute_path = PathBuf::from( &fs::canonicalize(relpath).expect("Given bogus file path!") );
-    let basename      = PathBuf::from( absolute_path.file_name().expect("No file name!") );
-    let exists        = absolute_path.exists();
-    let dotfile_path  = PathBuf::new(); // temporary
-
-    let mut dotfile = DotFile {
+    let dotfile = DotFile {
         exists:        exists,
         basename:      basename,
         absolute_path: absolute_path,
-        dotfile_path:  dotfile_path, // temporary
+        dotfile_path:  dotfile_path,
         homedir:       homedir,
     };
 
-    dotfile.dotfile_path = dotfile.dot();
-    let dotfile = dotfile; // make immutable
     Ok(dotfile) // return
 }
 
 impl DotFile {
-    #[allow(dead_code)]
-    pub fn new(p: & String) -> Result<DotFile, &'static str> {
+    pub fn new(p: &String) -> Result<DotFile, &'static str> {
         let dotfile = init(&PathBuf::from(p)); // Result<DotFile, &'static str>
         dotfile
     }
 
     #[allow(dead_code)]
     pub fn is_dotted(&self) -> bool {
-        let first_char = match self.basename.to_str() {
-            Some(string) => string.chars().nth(0),
-            None => return false,
-        }.unwrap();
-
-        if first_char == '.' {
-            true
-        } else {
-            false
-        }
+        is_dotted!(self.basename)
     }
 
     #[allow(dead_code)]
     fn dot(&self) -> PathBuf { // Getting less hacky
-
-        let mut dotfile_path = self.homedir.to_path_buf();
-        if !self.is_dotted() {
-            dotfile_path.push(".".to_string() + &self.basename.to_str().unwrap());
-        } else {
-            dotfile_path.push(&self.basename);
-        }
-        dotfile_path
+        dot(&self.basename, &self.homedir)
     }
 
     #[allow(dead_code)]
@@ -81,7 +60,6 @@ impl DotFile {
         }
         PathBuf::from(path)
     }
-
 }
 
 impl fmt::Debug for DotFile {
@@ -100,4 +78,15 @@ impl fmt::Debug for DotFile {
             self.homedir.display()
         )
     }
+}
+
+fn dot(basename: &PathBuf, homedir: &PathBuf) -> PathBuf {
+    let mut dotfile_path = homedir.to_owned(); // to owned
+
+    if !(is_dotted!(basename)) { // if not already dotted
+        dotfile_path.push(".".to_string() + basename.to_str().unwrap()); // dot it
+    } else { // else do nothing
+        dotfile_path.push(basename);
+    }
+    dotfile_path
 }

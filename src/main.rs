@@ -22,7 +22,7 @@ fn main() {
                     println!("{:?}", e);
                     },
             }
-        } else { // error
+        } else { // error - doesn't exist
             println!("{:?}", dotfile);
             panic!("File doesn't exist!");
         }
