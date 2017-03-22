@@ -1,5 +1,5 @@
 extern crate dotfile;
-use dotfile::dotfile::DotFile;
+use dotfile::DotFile;
 use std::os::unix::fs;
 
 fn main() {
