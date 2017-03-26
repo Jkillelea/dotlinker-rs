@@ -1,9 +1,10 @@
 extern crate dotfile;
 use dotfile::DotFile;
 use std::os::unix::fs;
+use std::env;
 
 fn main() {
-    let mut args = std::env::args();
+    let mut args = env::args();
     let _ = args.next(); // skip command name
 
     while let Some(path) = args.next() {
@@ -11,7 +12,6 @@ fn main() {
             Ok(dotfile) => dotfile,
             Err(msg)    => panic!("{}", msg),
         };
-
         if dotfile.exists { // check existence
             match fs::symlink(&dotfile.absolute_path, &dotfile.dotfile_path) { // if so, symlink
                 Ok(_)  => {},
