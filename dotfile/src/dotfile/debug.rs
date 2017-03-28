@@ -2,6 +2,7 @@ use std::fmt;
 use super::DotFile;
 
 impl fmt::Debug for DotFile {
+    // can also use the format string :#? for automatic pretty output
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         write!(f, "DotFile {{ \
             \n\texists:        {}\
