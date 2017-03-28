@@ -5,7 +5,12 @@ use std::path::PathBuf;
 // }
 
 pub fn is_dotted(p: &PathBuf) -> bool {
-    p.to_str().unwrap().chars().nth(0) == Some('.')
+    let s = match p.to_str() {
+        Some(s) => s,
+        None    => return false
+    };
+
+    s.chars().nth(0) == Some('.')
 }
 
 pub fn dot(basename: &PathBuf, homedir: &PathBuf) -> PathBuf {
