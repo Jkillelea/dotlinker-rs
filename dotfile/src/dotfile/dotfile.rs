@@ -43,12 +43,15 @@ impl DotFile {
             Ok(abspath) => abspath,
             Err(_)      => return Err("Couldn't find absolute_path!")
         };
-        let homedir  = match env::home_dir() {
+        let homedir = match env::home_dir() {
             Some(path) => path as PathBuf,
             None       => return Err("No home directory was found!")
         };
-
-        let basename     = PathBuf::from(absolute_path.file_name().unwrap());
+        let basename = match absolute_path.file_name() {
+            Some(fname) => PathBuf::from(fname),
+            None        => return Err("Couldn't get file name!")
+        };
+        
         let exists       = absolute_path.exists();
         let dotfile_path = util::dot(&basename, &homedir);
 
