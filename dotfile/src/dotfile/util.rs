@@ -4,6 +4,7 @@ use std::path::PathBuf;
 //     ($x: expr) => (($x.to_str().unwrap().chars().nth(0) == Some('.')));
 // }
 
+// check if name starts with a '.'
 pub fn is_dotted(p: &PathBuf) -> bool {
     let s = match p.to_str() {
         Some(s) => s,
@@ -13,6 +14,7 @@ pub fn is_dotted(p: &PathBuf) -> bool {
     s.chars().nth(0) == Some('.')
 }
 
+// add a '.' to the name if it's not there already
 pub fn dot(basename: &PathBuf, homedir: &PathBuf) -> Option<PathBuf> {
     let mut dotfile_path = homedir.to_owned(); // to owned
 

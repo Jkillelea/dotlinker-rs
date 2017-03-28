@@ -41,7 +41,7 @@ impl DotFile {
 
         let absolute_path = match fs::canonicalize(relpath) {
             Ok(abspath) => abspath,
-            Err(_)      => return Err("Couldn't find absolute_path!") // canonicalize would return an io::error::Error normally
+            Err(_)      => return Err("Couldn't find absolute_path!") // canonicalize would return an io::Error normally
         };
         let homedir = match env::home_dir() {
             Some(path) => path as PathBuf,
