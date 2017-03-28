@@ -24,7 +24,7 @@ impl DotFile {
     }
 
     #[allow(dead_code)]
-    pub fn dot(&self) -> PathBuf { // Getting less hacky
+    pub fn dot(&self) -> Option<PathBuf> { // Getting less hacky
         util::dot(&self.basename, &self.homedir)
     }
 
@@ -51,9 +51,12 @@ impl DotFile {
             Some(fname) => PathBuf::from(fname),
             None        => return Err("Couldn't get file name!")
         };
-        
-        let exists       = absolute_path.exists();
-        let dotfile_path = util::dot(&basename, &homedir);
+        let dotfile_path = match util::dot(&basename, &homedir) {
+            Some(path) => path,
+            None       => return Err("Error trying to dot the basename!")
+        };
+
+        let exists = absolute_path.exists();
 
         let dotfile = DotFile {
             exists:        exists,

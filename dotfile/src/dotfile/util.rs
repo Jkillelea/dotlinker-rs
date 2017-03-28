@@ -13,13 +13,18 @@ pub fn is_dotted(p: &PathBuf) -> bool {
     s.chars().nth(0) == Some('.')
 }
 
-pub fn dot(basename: &PathBuf, homedir: &PathBuf) -> PathBuf {
+pub fn dot(basename: &PathBuf, homedir: &PathBuf) -> Option<PathBuf> {
     let mut dotfile_path = homedir.to_owned(); // to owned
 
     if !(is_dotted(basename)) { // if not already dotted
-        dotfile_path.push(".".to_string() + basename.to_str().unwrap()); // dot it
+        let base_str = match basename.to_str() {
+            Some(s) => s,
+            None => return None
+        };
+        dotfile_path.push(".".to_string() + base_str); // dot it
     } else { // else do nothing
         dotfile_path.push(basename);
     }
-    dotfile_path
+
+    Some(dotfile_path)
 }
