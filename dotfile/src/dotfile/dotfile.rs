@@ -55,7 +55,6 @@ impl DotFile {
             Some(path) => path,
             None       => return Err("Error trying to dot the basename!")
         };
-
         let exists = absolute_path.exists();
 
         let dotfile = DotFile {
