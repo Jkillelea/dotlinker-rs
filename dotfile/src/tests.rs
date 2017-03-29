@@ -19,12 +19,12 @@ fn generates_a_dotfile() {
 
 #[test]
 fn checks_existence() {
+    // create something we know to exist
     let dotfile = match DotFile::new("/home/jacob/.bashrc") {
         Ok(dotfile) => dotfile,
-        Err(e) => panic!(e)
+        Err(e) => panic!(e) // panic if this fails (it shouldn't)
     };
     if !dotfile.exists {
         panic!("created a dotfile which doesn't exist!");
     }
-
 }
