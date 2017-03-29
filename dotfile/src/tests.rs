@@ -5,14 +5,14 @@ use super::*;
 fn finds_home_dir() {
     match env::home_dir() {
         Some(_) => {},
-        None => {assert!(false, "Couldn't find home dir!");}
+        None => assert!(false, "Couldn't find home dir!")
     };
 }
 
 #[test]
 fn generates_a_dotfile() {
     let _ = match DotFile::new("/home/jacob/.bashrc") {
-        Ok(dotfile) => dotfile,
+        Ok(_) => {},
         Err(e) => panic!(e)
     };
 }
