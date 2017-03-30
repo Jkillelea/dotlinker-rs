@@ -21,7 +21,7 @@ pub fn dot(basename: &PathBuf, homedir: &PathBuf) -> Option<PathBuf> {
     if !(is_dotted(basename)) { // if not already dotted
         let base_str = match basename.to_str() {
             Some(s) => s,
-            None => return None
+            None    => return None
         };
         dotfile_path.push(".".to_string() + base_str); // dot it
     } else { // else do nothing
