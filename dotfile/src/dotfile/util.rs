@@ -18,7 +18,7 @@ pub fn is_dotted(p: &PathBuf) -> bool {
 pub fn dot(basename: &PathBuf, homedir: &PathBuf) -> Option<PathBuf> {
     let mut dotfile_path = homedir.to_owned(); // to owned
 
-    if !(is_dotted(basename)) { // if not already dotted
+    if !is_dotted(basename) { // if not already dotted
         let base_str = match basename.to_str() {
             Some(s) => s,
             None    => return None

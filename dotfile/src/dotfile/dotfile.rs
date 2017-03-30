@@ -14,7 +14,7 @@ pub struct DotFile {
 impl DotFile {
     #[allow(dead_code)]
     pub fn new(p: &str) -> Result<DotFile, String> {
-        let dotfile = DotFile::init(&PathBuf::from(p)); // Result<DotFile, &'static str>
+        let dotfile = DotFile::init(&PathBuf::from(p));
         dotfile
     }
 
