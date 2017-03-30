@@ -13,7 +13,7 @@ pub struct DotFile {
 
 impl DotFile {
     #[allow(dead_code)]
-    pub fn new(p: &str) -> Result<DotFile, &'static str> {
+    pub fn new(p: &str) -> Result<DotFile, String> {
         let dotfile = DotFile::init(&PathBuf::from(p)); // Result<DotFile, &'static str>
         dotfile
     }
@@ -37,22 +37,22 @@ impl DotFile {
         PathBuf::from(path)
     }
 
-    fn init(relpath: &PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
+    fn init(relpath: &PathBuf) -> Result<DotFile, String> { // init handles preparing a DotFile struct
         let absolute_path = match fs::canonicalize(relpath) {
             Ok(abspath) => abspath,
-            Err(_)      => return Err("Couldn't find absolute_path!") // canonicalize would return an io::Error normally
+            Err(e)      => return Err(e.to_string()) // canonicalize would return an io::Error normally
         };
         let homedir = match env::home_dir() {
             Some(path) => path as PathBuf,
-            None       => return Err("No home directory was found!")
+            None       => return Err(String::from("No home directory was found!"))
         };
         let basename = match absolute_path.file_name() {
             Some(fname) => PathBuf::from(fname),
-            None        => return Err("Couldn't get file name!")
+            None        => return Err(String::from("Couldn't get file name!"))
         };
         let dotfile_path = match util::dot(&basename, &homedir) {
             Some(path) => path,
-            None       => return Err("Error trying to dot the basename!")
+            None       => return Err(String::from("Error trying to dot the basename!"))
         };
         let exists = absolute_path.exists();
 
