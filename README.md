@@ -1,4 +1,4 @@
-# dotlinker-rs ![](https://travis-ci.org/Jkillelea/dotlinker-rs.svg?branch=master)
+# dotlinker-rs ![https://travis-ci.org/Jkillelea/dotlinker-rs](https://travis-ci.org/Jkillelea/dotlinker-rs.svg?branch=master)
 Rust implementation of dotlinker
 
 My Rust implementation of previous work in C++ and Ruby.
