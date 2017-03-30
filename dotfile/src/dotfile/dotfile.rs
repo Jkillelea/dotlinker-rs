@@ -38,7 +38,6 @@ impl DotFile {
     }
 
     fn init(relpath: &PathBuf) -> Result<DotFile, &'static str> { // init handles preparing a DotFile struct
-
         let absolute_path = match fs::canonicalize(relpath) {
             Ok(abspath) => abspath,
             Err(_)      => return Err("Couldn't find absolute_path!") // canonicalize would return an io::Error normally
